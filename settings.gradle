@@ -9,5 +9,6 @@
 
 include 'aula02'
 include 'aula03-strategy-and-injection'
+include 'aula04-template-method'
 
 rootProject.name = 'isel-mpd-aulas-2020'

@@ -3,18 +3,18 @@
  */
 package pt.isel.mpd;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.time.LocalDate;
 import java.util.List;
 
-import static org.junit.Assert.*;
-
 public class WeatherWebApiTest {
     @Test public void testPastWeather() {
-        WeatherWebApi api = new WeatherWebApi();
+        WeatherWebApi api = new WeatherWebApi(new MockRequest());
         List<WeatherInfo> jan = api.pastWeather(37.017, -7.933, LocalDate.of(2020, 1, 1), LocalDate.of(2020, 1, 30));
-        jan.forEach(System.out::println);
+        WeatherInfo first = jan.iterator().next();
+        Assert.assertEquals(14, first.tempC);
     }
 
     // TPC: Add unit test for search() of WeatherWebApi

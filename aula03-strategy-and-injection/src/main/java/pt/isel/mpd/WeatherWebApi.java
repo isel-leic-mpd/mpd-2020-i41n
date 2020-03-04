@@ -1,12 +1,8 @@
 package pt.isel.mpd;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class WeatherWebApi {
@@ -14,6 +10,12 @@ public class WeatherWebApi {
     final String PATH_PAST_WEATHER = "past-weather.ashx?q=%s,%s&date=%s&enddate=%s&tp=24&format=csv&key=%s";
     final String PATH_SEARCH = "search.ashx?query=%s&format=tab&key=%s";
     final String WEATHER_KEY = "cd74a204137f42db98b112845202802";
+
+    private final Request req;
+
+    public WeatherWebApi(Request req) {
+        this.req = req;
+    }
 
     /**
      * E.g. http://api.worldweatheronline.com/premium/v1/past-weather.ashx?q=37.017,-7.933&date=2019-01-01&enddate=2019-01-30&tp=24&format=csv&key=10a7e54b547c4c7c870162131192102
@@ -27,19 +29,13 @@ public class WeatherWebApi {
     public List<WeatherInfo> pastWeather(double lat, double log, LocalDate from, LocalDate to) {
         String path = HOST + String.format(PATH_PAST_WEATHER, lat, log, from, to, WEATHER_KEY);
         List<WeatherInfo> infos = new ArrayList<>();
-        try(
-            InputStream in = new URL(path).openStream();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(in)))
-        {
-            String line;
-            while (reader.readLine().startsWith("#")) { } // Skip comments
-            reader.readLine();                            // Skip Not Available
-            while ((line = reader.readLine()) != null) {
-                infos.add(WeatherInfo.valueOf(line));
-                reader.readLine();                        // Skip daily information
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        List<String> body = req.getLines(path);
+        Iterator<String> reader = body.iterator();
+        while (reader.next().startsWith("#")) { } // Skip comments
+        reader.next();                            // Skip Not Available
+        while (reader.hasNext()) {
+            infos.add(WeatherInfo.valueOf(reader.next()));
+            if(reader.hasNext()) reader.next();                        // Skip daily information
         }
         return infos;
     }
@@ -54,17 +50,12 @@ public class WeatherWebApi {
         String path = HOST + String.format(PATH_SEARCH, query, WEATHER_KEY);
         System.out.println(path);
         List<LocationInfo> locations = new ArrayList<>();
-        try(
-            InputStream in = new URL(path).openStream();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(in)))
-        {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if(line.startsWith("#")) continue;
-                locations.add(LocationInfo.valueOf(line));
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        List<String> body = req.getLines(path);
+        Iterator<String> reader = body.iterator();
+        while (reader.hasNext()) {
+            String line = reader.next();
+            if(line.startsWith("#")) continue;
+            locations.add(LocationInfo.valueOf(line));
         }
         return locations;
     }

@@ -16,6 +16,21 @@ public class WeatherInfo {
         this.desc = desc;
     }
 
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public int getTempC() {
+        return tempC;
+    }
+
+    public double getPrecipMM() {
+        return precipMM;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
 
     public static WeatherInfo valueOf(String line) {
         String[] words = line.split(",");

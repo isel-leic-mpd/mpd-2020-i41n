@@ -11,6 +11,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import static pt.isel.mpd.util.EagerQueries.filter;
+import static pt.isel.mpd.util.EagerQueries.map;
+import static pt.isel.mpd.util.EagerQueries.skip;
+
 public class WeatherWebApi {
     final static String HOST = "http://api.worldweatheronline.com/premium/v1/";
     final static String PATH_PAST_WEATHER = "past-weather.ashx?q=%s,%s&date=%s&enddate=%s&tp=24&format=csv&key=%s";
@@ -43,18 +47,14 @@ public class WeatherWebApi {
      * @param to End date
      * @return List of WeatherInfo objects with weather information.
      */
-    public List<WeatherInfo> pastWeather(double lat, double log, LocalDate from, LocalDate to) {
+    public Iterable<WeatherInfo> pastWeather(double lat, double log, LocalDate from, LocalDate to) {
         String path = HOST + String.format(PATH_PAST_WEATHER, lat, log, from, to, WEATHER_KEY);
-        List<WeatherInfo> infos = new ArrayList<>();
-        List<String> body = req.getLines(path);
-        Iterator<String> reader = body.iterator();
-        while (reader.next().startsWith("#")) { } // Skip comments
-        reader.next();                            // Skip Not Available
-        while (reader.hasNext()) {
-            infos.add(WeatherInfo.valueOf(reader.next()));
-            if(reader.hasNext()) reader.next();                        // Skip daily information
-        }
-        return infos;
+        Iterable<String> body = req.getLines(path);
+        final boolean[] skipline = {true};
+        body = filter(body, l -> !l.startsWith("#")); // Skip comments
+        body = skip(body, 1); // Skip Not Available
+        body = filter(body, __ -> skipline[0] = !skipline[0]); // Skip daily information
+        return map(body, WeatherInfo::valueOf);
     }
 
     /**
@@ -63,17 +63,11 @@ public class WeatherWebApi {
      * @param query Name of the city you are looking for.
      * @return List of LocationInfo objects with location information.
      */
-    public List<LocationInfo> search(String query) {
+    public Iterable<LocationInfo> search(String query) {
         String path = HOST + String.format(PATH_SEARCH, query, WEATHER_KEY);
         System.out.println(path);
-        List<LocationInfo> locations = new ArrayList<>();
-        List<String> body = req.getLines(path);
-        Iterator<String> reader = body.iterator();
-        while (reader.hasNext()) {
-            String line = reader.next();
-            if(line.startsWith("#")) continue;
-            locations.add(LocationInfo.valueOf(line));
-        }
-        return locations;
+        Iterable<String> body = req.getLines(path);
+        body = filter(body, l -> !l.startsWith("#")); // Skip comments
+        return map(body, LocationInfo::valueOf);
     }
 }

@@ -16,7 +16,7 @@ import java.util.List;
 public class WeatherWebApiTest {
     @Test public void testPastWeather() {
         WeatherWebApi api = new WeatherWebApi(new HttpRequest());
-        List<WeatherInfo> jan = api.pastWeather(37.017, -7.933, LocalDate.of(2020, 1, 1), LocalDate.of(2020, 1, 30));
+        Iterable<WeatherInfo> jan = api.pastWeather(37.017, -7.933, LocalDate.of(2020, 1, 1), LocalDate.of(2020, 1, 30));
         WeatherInfo first = jan.iterator().next();
         Assert.assertEquals(14, first.tempC);
     }

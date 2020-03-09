@@ -5,30 +5,38 @@ package pt.isel.mpd;
 
 import org.junit.Assert;
 import org.junit.Test;
+import pt.isel.mpd.util.EagerQueries;
 import pt.isel.mpd.util.MockRequest;
 import pt.isel.mpd.weather.WeatherInfo;
-import pt.isel.mpd.weather.WeatherPredicate;
-import pt.isel.mpd.weather.WeatherQueries;
 import pt.isel.mpd.weather.WeatherWebApi;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.function.Predicate;
 
-public class WeatherQueriesTest {
+import static org.junit.Assert.assertEquals;
+import static pt.isel.mpd.util.EagerQueries.filter;
+import static pt.isel.mpd.util.EagerQueries.map;
+import static pt.isel.mpd.util.EagerQueries.max;
+
+public class EagerQueriesTest {
     final Iterable<WeatherInfo> jan;
 
-    public WeatherQueriesTest() {
+    public EagerQueriesTest() {
         WeatherWebApi api = new WeatherWebApi(new MockRequest());
         jan = api.pastWeather(37.017, -7.933, LocalDate.of(2020, 1, 1), LocalDate.of(2020, 1, 30));
     }
 
+    @Test public void testMaxTemperatureOnSunnyDays() {
+        int maxTemp = max(map(filter(jan, wi -> wi.getDesc().contains("Sun")), WeatherInfo::getTempC));
+        assertEquals(15, maxTemp);
+    }
+
+
+
     @Test public void testFilterCloudyDays() {
-        Iterable<WeatherInfo> cloud = WeatherQueries
-            // .filter(jan, info -> info.desc.toLowerCase().contains("cloud"));
-            .filter(jan, WeatherQueriesTest::cloudyDays);
-        int count = 0;
-        for (var info: cloud) { count++; }
-        Assert.assertEquals(14, count);
+        Iterable<WeatherInfo> cloud = filter(jan, EagerQueriesTest::cloudyDays);
+        assertEquals(14, EagerQueries.count(cloud));
     }
 
     static boolean cloudyDays(WeatherInfo info) {
@@ -36,27 +44,23 @@ public class WeatherQueriesTest {
     }
 
     @Test public void testFilterWithRainnyDaysPredicate() {
-        Iterable<WeatherInfo> rainny = WeatherQueries.filter(jan, new RainnyDays());
-        int count = 0;
-        for (var info: rainny) { count++; }
-        Assert.assertEquals(11, count);
+        Iterable<WeatherInfo> rainny = filter(jan, new RainnyDays());
+        assertEquals(11,  EagerQueries.count(rainny));
     }
 
     @Test public void testFilterWithWarmDaysPredicate() {
-        Iterable<WeatherInfo> warm = WeatherQueries.filter(jan, new WarmDays());
-        int count = 0;
-        for (var info: warm) { count++; }
-        Assert.assertEquals(27, count);
+        Iterable<WeatherInfo> warm = filter(jan, new WarmDays());
+        assertEquals(27,  EagerQueries.count(warm));
     }
 
-    private class RainnyDays implements WeatherPredicate {
+    private class RainnyDays implements Predicate<WeatherInfo> {
         @Override
         public boolean test(WeatherInfo info) {
             return info.precipMM != 0;
         }
     }
 
-    private class WarmDays implements WeatherPredicate {
+    private class WarmDays implements Predicate<WeatherInfo> {
         @Override
         public boolean test(WeatherInfo info) {
             return info.tempC >= 14;

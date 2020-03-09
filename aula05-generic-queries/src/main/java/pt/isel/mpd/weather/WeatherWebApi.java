@@ -2,18 +2,33 @@ package pt.isel.mpd.weather;
 
 import pt.isel.mpd.util.Request;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 public class WeatherWebApi {
-    final String HOST = "http://api.worldweatheronline.com/premium/v1/";
-    final String PATH_PAST_WEATHER = "past-weather.ashx?q=%s,%s&date=%s&enddate=%s&tp=24&format=csv&key=%s";
-    final String PATH_SEARCH = "search.ashx?query=%s&format=tab&key=%s";
-    final String WEATHER_KEY = "cd74a204137f42db98b112845202802";
+    final static String HOST = "http://api.worldweatheronline.com/premium/v1/";
+    final static String PATH_PAST_WEATHER = "past-weather.ashx?q=%s,%s&date=%s&enddate=%s&tp=24&format=csv&key=%s";
+    final static String PATH_SEARCH = "search.ashx?query=%s&format=tab&key=%s";
+    final static String WEATHER_KEY;
 
     private final Request req;
+
+    static {
+        try(
+            InputStream in = ClassLoader.getSystemClassLoader().getResourceAsStream("WEATHER_KEY.txt");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in)))
+        {
+            WEATHER_KEY = reader.readLine();
+        } catch (IOException e) {
+            throw new RuntimeException("Error reading WEATHER_KEY.txt. Put your world weather online key within WEATHER_KEY.txt in resources folder.");
+        }
+    }
 
     public WeatherWebApi(Request req) {
         this.req = req;

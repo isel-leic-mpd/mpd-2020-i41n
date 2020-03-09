@@ -13,7 +13,7 @@ public class WeatherWebApi {
     final String HOST = "http://api.worldweatheronline.com/premium/v1/";
     final String PATH_PAST_WEATHER = "past-weather.ashx?q=%s,%s&date=%s&enddate=%s&tp=24&format=csv&key=%s";
     final String PATH_SEARCH = "search.ashx?query=%s&format=tab&key=%s";
-    final String WEATHER_KEY = "cd74a204137f42db98b112845202802";
+    final String WEATHER_KEY = "****************"; // Place your key here
 
     /**
      * E.g. http://api.worldweatheronline.com/premium/v1/past-weather.ashx?q=37.017,-7.933&date=2019-01-01&enddate=2019-01-30&tp=24&format=csv&key=10a7e54b547c4c7c870162131192102

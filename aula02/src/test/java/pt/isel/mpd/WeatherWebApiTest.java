@@ -5,6 +5,7 @@ package pt.isel.mpd;
 
 import org.junit.Test;
 
+import java.net.http.HttpRequest;
 import java.time.LocalDate;
 import java.util.List;
 

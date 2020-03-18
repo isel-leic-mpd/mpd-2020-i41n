@@ -1,4 +1,4 @@
-package pt.isel.mpd.weather;
+package pt.isel.mpd.weather.dto;
 
 import java.time.LocalDate;
 

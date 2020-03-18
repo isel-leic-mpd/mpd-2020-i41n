@@ -3,18 +3,14 @@
  */
 package pt.isel.mpd;
 
-import org.junit.Assert;
 import org.junit.Test;
 import pt.isel.mpd.util.AbstractRequest;
 import pt.isel.mpd.util.HttpRequest;
-import pt.isel.mpd.util.LazyQueries;
-import pt.isel.mpd.util.MockRequest;
-import pt.isel.mpd.weather.WeatherInfo;
+import pt.isel.mpd.weather.dto.WeatherInfo;
 import pt.isel.mpd.weather.WeatherWebApi;
 
 import java.io.InputStream;
 import java.time.LocalDate;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static pt.isel.mpd.util.LazyQueries.*;

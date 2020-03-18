@@ -1,6 +1,8 @@
 package pt.isel.mpd.weather;
 
 import pt.isel.mpd.util.Request;
+import pt.isel.mpd.weather.dto.LocationInfo;
+import pt.isel.mpd.weather.dto.WeatherInfo;
 
 import java.io.BufferedReader;
 import java.io.IOException;

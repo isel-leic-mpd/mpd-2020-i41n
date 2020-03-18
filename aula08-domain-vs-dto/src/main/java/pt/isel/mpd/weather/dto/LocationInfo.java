@@ -1,10 +1,10 @@
-package pt.isel.mpd.weather;
+package pt.isel.mpd.weather.dto;
 
 public class LocationInfo {
-    private final String country;
-    private final String region;
-    private final double latitude;
-    private final double longitude;
+    public final String country;
+    public final String region;
+    public final double latitude;
+    public final double longitude;
 
     public LocationInfo(String country, String region, double latitude, double longitude) {
         this.country = country;

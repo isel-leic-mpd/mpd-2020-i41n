@@ -3,15 +3,13 @@
  */
 package pt.isel.mpd;
 
-import org.junit.Assert;
 import org.junit.Test;
 import pt.isel.mpd.util.EagerQueries;
 import pt.isel.mpd.util.MockRequest;
-import pt.isel.mpd.weather.WeatherInfo;
+import pt.isel.mpd.weather.dto.WeatherInfo;
 import pt.isel.mpd.weather.WeatherWebApi;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.function.Predicate;
 
 import static org.junit.Assert.assertEquals;

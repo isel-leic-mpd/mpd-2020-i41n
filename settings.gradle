@@ -15,5 +15,6 @@ include 'aula06-lazy-queries'
 include 'aula07-lazy-reader'
 include 'aula08-domain-vs-dto'
 include 'aula09-json-and-restful'
+include 'aula10-optional'
 
 rootProject.name = 'isel-mpd-aulas-2020'

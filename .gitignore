@@ -6,6 +6,7 @@ build
 
 # Ignore intelliJ metadata
 .idea
+out/
 
 # Ignore World weather key
 WEATHER_KEY.txt

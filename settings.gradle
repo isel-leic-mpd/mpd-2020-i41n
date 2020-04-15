@@ -18,5 +18,6 @@ include 'aula09-json-and-restful'
 include 'aula10-optional'
 include 'aula13-composition'
 include 'aula16-streams'
+include 'aula17-abstract-spliterator'
 
 rootProject.name = 'isel-mpd-aulas-2020'

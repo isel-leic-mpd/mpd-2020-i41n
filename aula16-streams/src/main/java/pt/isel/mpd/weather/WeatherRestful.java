@@ -14,12 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.time.LocalDate;
-import java.util.Arrays;
-
-import static java.util.Arrays.asList;
-import static pt.isel.mpd.util.LazyQueries.filter;
-import static pt.isel.mpd.util.LazyQueries.map;
-import static pt.isel.mpd.util.LazyQueries.skip;
+import java.util.stream.Stream;
 
 public class WeatherRestful implements  WeatherApi  {
     final static String HOST = "http://api.worldweatheronline.com/premium/v1/";
@@ -54,13 +49,13 @@ public class WeatherRestful implements  WeatherApi  {
      * @param to End date
      * @return List of WeatherInfo objects with weather information.
      */
-    public Iterable<WeatherInfo> pastWeather(double lat, double log, LocalDate from, LocalDate to) {
+    public Stream<WeatherInfo> pastWeather(double lat, double log, LocalDate from, LocalDate to) {
         String path = HOST + String.format(PATH_PAST_WEATHER, lat, log, from, to, WEATHER_KEY);
         Iterable<String> lines = req.getLines(path);
         String body = String.join("",lines);
         PastWeatherDto dto = gson.fromJson(body, PastWeatherDto.class);
         PastWeatherDataWeatherDto[] infos = dto.getData().getWeather();
-        return map(asList(infos), WeatherRestful::toPastWeather);
+        return Stream.of(infos).map(WeatherRestful::toPastWeather);
     }
     private static WeatherInfo toPastWeather(PastWeatherDataWeatherDto dto){
         return new WeatherInfo(
@@ -76,12 +71,14 @@ public class WeatherRestful implements  WeatherApi  {
      * @param query Name of the city you are looking for.
      * @return List of LocationInfo objects with location information.
      */
-    public Iterable<LocationInfo> search(String query) {
+    public Stream<LocationInfo> search(String query) {
         String path = HOST + String.format(PATH_SEARCH, query, WEATHER_KEY);
         Iterable<String> lines = req.getLines(path);
         String body = String.join("", lines);
         SearchDto dto = gson.fromJson(body, SearchDto.class);
-        return map(asList(dto.getSearch_api().getResult()), WeatherRestful::toLocationInfo);
+        return Stream
+            .of(dto.getSearch_api().getResult())
+            .map(WeatherRestful::toLocationInfo);
     }
 
     private static LocationInfo toLocationInfo(SearchApiResultDto dto) {

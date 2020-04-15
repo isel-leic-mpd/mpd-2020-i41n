@@ -9,10 +9,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.time.LocalDate;
-
-import static pt.isel.mpd.util.LazyQueries.filter;
-import static pt.isel.mpd.util.LazyQueries.map;
-import static pt.isel.mpd.util.LazyQueries.skip;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class WeatherWebApi implements  WeatherApi {
     final static String HOST = "http://api.worldweatheronline.com/premium/v1/";
@@ -46,27 +44,30 @@ public class WeatherWebApi implements  WeatherApi {
      * @param to End date
      * @return List of WeatherInfo objects with weather information.
      */
-    public Iterable<WeatherInfo> pastWeather(double lat, double log, LocalDate from, LocalDate to) {
+    public Stream<WeatherInfo> pastWeather(double lat, double log, LocalDate from, LocalDate to) {
         String path = HOST + String.format(PATH_PAST_WEATHER, lat, log, from, to, WEATHER_KEY);
         Iterable<String> body = req.getLines(path);
         final boolean[] skipline = {true};
-        body = filter(body, l -> !l.startsWith("#")); // Skip comments
-        body = skip(body, 1); // Skip Not Available
-        body = filter(body, __ -> skipline[0] = !skipline[0]); // Skip daily information
-        return map(body, WeatherInfo::valueOf);
+        return StreamSupport
+            .stream(body.spliterator(), false)
+            .filter(l -> !l.startsWith("#")) // Skip comments
+            .skip(1) // Skip Not Available
+            .filter(__ -> skipline[0] = !skipline[0]) // Skip daily information
+            .map(WeatherInfo::valueOf);
     }
-
     /**
      * e.g. http://api.worldweatheronline.com/premium/v1/search.ashx?query=Oporto&format=tab&key=10a7e54b547c4c7c870162131192102
      *
      * @param query Name of the city you are looking for.
      * @return List of LocationInfo objects with location information.
      */
-    public Iterable<LocationInfo> search(String query) {
+    public Stream<LocationInfo> search(String query) {
         String path = HOST + String.format(PATH_SEARCH, query, WEATHER_KEY);
         System.out.println(path);
         Iterable<String> body = req.getLines(path);
-        body = filter(body, l -> !l.startsWith("#")); // Skip comments
-        return map(body, LocationInfo::valueOf);
+        return StreamSupport
+            .stream(body.spliterator(), false)
+            .filter(l -> !l.startsWith("#")) // Skip comments
+            .map(LocationInfo::valueOf);
     }
 }

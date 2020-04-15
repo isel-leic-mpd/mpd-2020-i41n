@@ -2,20 +2,21 @@ package pt.isel.mpd.weather.model;
 
 import java.time.LocalDate;
 import java.util.function.BiFunction;
+import java.util.stream.Stream;
 
 public class Location {
     private final String country;
     private final String region;
     private final double latitude;
     private final double longitude;
-    private final BiFunction<LocalDate, LocalDate, Iterable<Weather>> pastGetter;
+    private final BiFunction<LocalDate, LocalDate, Stream<Weather>> pastGetter;
 
     public Location(
         String country,
         String region,
         double latitude,
         double longitude,
-        BiFunction<LocalDate, LocalDate, Iterable<Weather>> pastGetter)
+        BiFunction<LocalDate, LocalDate, Stream<Weather>> pastGetter)
      {
         this.country = country;
         this.region = region;
@@ -24,7 +25,7 @@ public class Location {
         this.pastGetter = pastGetter;
     }
 
-    public Iterable<Weather> pastWeather(LocalDate from, LocalDate to) {
+    public Stream<Weather> pastWeather(LocalDate from, LocalDate to) {
         return pastGetter.apply(from, to);
     }
 

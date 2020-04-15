@@ -35,9 +35,9 @@ public class WeatherWebApiTest {
         RequestMediator req = new RequestMediator(new HttpRequest());
         WeatherWebApi api = new WeatherWebApi(req);
         Stream<WeatherInfo> jan = api.pastWeather(37.017, -7.933, LocalDate.of(2020, 1, 1), LocalDate.of(2020, 1, 30));
-        assertEquals(1, req.count); // => !!!! EAGER => Fix this !!!
+        assertEquals(0, req.count); // => Lazy
         Stream<Integer> tempsJan = jan.map(wi -> wi.getTempC());
-        assertEquals(1, req.count); // => !!!! should be ZERO
+        assertEquals(0, req.count); // => Lazy
         int max = tempsJan.max(Integer::compare).get();
         assertEquals(1, req.count); // Terminal Operation consumes pipeline
         assertEquals(17, max);

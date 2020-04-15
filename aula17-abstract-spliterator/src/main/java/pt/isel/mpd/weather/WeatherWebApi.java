@@ -46,10 +46,9 @@ public class WeatherWebApi implements  WeatherApi {
      */
     public Stream<WeatherInfo> pastWeather(double lat, double log, LocalDate from, LocalDate to) {
         String path = HOST + String.format(PATH_PAST_WEATHER, lat, log, from, to, WEATHER_KEY);
-        Iterable<String> body = req.getLines(path);
         final boolean[] skipline = {true};
-        return StreamSupport
-            .stream(body.spliterator(), false)
+        return req
+            .stream(path)
             .filter(l -> !l.startsWith("#")) // Skip comments
             .skip(1) // Skip Not Available
             .filter(__ -> skipline[0] = !skipline[0]) // Skip daily information

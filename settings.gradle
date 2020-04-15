@@ -17,5 +17,6 @@ include 'aula08-domain-vs-dto'
 include 'aula09-json-and-restful'
 include 'aula10-optional'
 include 'aula13-composition'
+include 'aula16-streams'
 
 rootProject.name = 'isel-mpd-aulas-2020'

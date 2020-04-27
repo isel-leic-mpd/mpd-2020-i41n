@@ -20,5 +20,6 @@ include 'aula13-composition'
 include 'aula16-streams'
 include 'aula17-abstract-spliterator'
 include 'aula18-primitive-and-reduction'
+include 'aula21-sequence-function'
 
 rootProject.name = 'isel-mpd-aulas-2020'

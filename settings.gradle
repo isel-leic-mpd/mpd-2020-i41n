@@ -22,5 +22,6 @@ include 'aula17-abstract-spliterator'
 include 'aula18-primitive-and-reduction'
 include 'aula21-sequence-function'
 include 'aula28-weather-async'
+include 'aula30-weather-reactive'
 
 rootProject.name = 'isel-mpd-aulas-2020'

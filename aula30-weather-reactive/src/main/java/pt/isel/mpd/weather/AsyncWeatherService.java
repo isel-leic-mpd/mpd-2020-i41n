@@ -1,14 +1,14 @@
 package pt.isel.mpd.weather;
 
+import io.reactivex.rxjava3.core.Observable;
 import pt.isel.mpd.weather.dto.LocationInfo;
 import pt.isel.mpd.weather.dto.WeatherInfo;
 import pt.isel.mpd.weather.model.AsyncLocation;
 import pt.isel.mpd.weather.model.Weather;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.time.temporal.ChronoUnit;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
 
 public class AsyncWeatherService {
     private final AsyncWeatherApi api;
@@ -17,18 +17,45 @@ public class AsyncWeatherService {
         this.api = api;
     }
 
-    public CompletableFuture<Stream<AsyncLocation>> search(String query) {
-        return api
-            .search(query) // CF<List<LocationInfo>>
-            .thenApply(List::stream)
-            .thenApply(strm -> strm.map(this::toLocation));
+    public Observable<AsyncLocation> search(String query) {
+        return fromCF(api
+            .search(query)) // Observable<List<LocationInfo>>
+            .flatMap(Observable::fromIterable)
+            .map(this::toLocation);
     }
 
-    public CompletableFuture<Stream<Weather>> pastWeather(double lat, double log, LocalDate from, LocalDate to) {
-        return api
-            .pastWeather(lat, log, from, to)
-            .thenApply(List::stream)
-            .thenApply(strm -> strm.map(this::toWeather));
+    public Observable<Weather> pastWeather(double lat, double log, LocalDate from, LocalDate to) {
+        LocalDate begin = from.withDayOfMonth(1);
+        int count = (int) ChronoUnit.MONTHS.between(from, to);
+        return Observable
+            .range(0, count + 1)               // Observable<Integer> => COLD
+            .map(inc -> begin.plusMonths(inc)) // Observable<LocalDate>
+            .map(start -> api.pastWeather(lat, log, start, min(to, lastDay(start)))) // Observable<CF<List<WeatherInfo>>>
+            .flatMap(Observable::fromFuture)   // Observable<List<WeatherInfo>>
+            .flatMap(Observable::fromIterable) // Observable<WeatherInfo>
+            .map(this::toWeather);
+    }
+
+    private LocalDate min(LocalDate to, LocalDate lastDay) {
+        return to.isBefore(lastDay) ? to : lastDay;
+    }
+
+    private static <T> Observable<T> fromCF(CompletableFuture<T> cf) {
+        return Observable.create(subscriber -> {
+            cf
+                .thenAccept(item -> {
+                    subscriber.onNext(item);
+                    subscriber.onComplete();
+                })
+                .exceptionally(err -> {
+                    subscriber.onError(err);
+                    return null;
+                });
+        });
+    }
+
+    private static LocalDate lastDay(LocalDate start) {
+        return start.withDayOfMonth(start.lengthOfMonth());
     }
 
     private AsyncLocation toLocation(LocationInfo dto) {

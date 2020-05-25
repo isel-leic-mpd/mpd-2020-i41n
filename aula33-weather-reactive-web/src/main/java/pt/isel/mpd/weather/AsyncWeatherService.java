@@ -31,7 +31,7 @@ public class AsyncWeatherService {
             .range(0, count + 1)               // Observable<Integer> => COLD
             .map(inc -> begin.plusMonths(inc)) // Observable<LocalDate>
             .map(start -> api.pastWeather(lat, log, start, min(to, lastDay(start)))) // Observable<CF<List<WeatherInfo>>>
-            .flatMap(Observable::fromFuture)   // Observable<List<WeatherInfo>>
+            .flatMap(cf -> fromCF(cf))   // Observable<List<WeatherInfo>>
             .flatMap(Observable::fromIterable) // Observable<WeatherInfo>
             .map(this::toWeather);
     }

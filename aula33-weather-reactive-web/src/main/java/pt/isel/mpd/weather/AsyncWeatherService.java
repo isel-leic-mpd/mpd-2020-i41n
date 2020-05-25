@@ -9,6 +9,7 @@ import pt.isel.mpd.weather.model.Weather;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 public class AsyncWeatherService {
     private final AsyncWeatherApi api;
@@ -28,7 +29,7 @@ public class AsyncWeatherService {
         LocalDate begin = from.withDayOfMonth(1);
         int count = (int) ChronoUnit.MONTHS.between(from, to);
         return Observable
-            .range(0, count + 1)               // Observable<Integer> => COLD
+            .intervalRange(0, count + 1, 0, 2000, TimeUnit.MILLISECONDS)               // Observable<Integer> => COLD
             .map(inc -> begin.plusMonths(inc)) // Observable<LocalDate>
             .map(start -> api.pastWeather(lat, log, start, min(to, lastDay(start)))) // Observable<CF<List<WeatherInfo>>>
             .flatMap(cf -> fromCF(cf))   // Observable<List<WeatherInfo>>

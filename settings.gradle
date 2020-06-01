@@ -24,5 +24,6 @@ include 'aula21-sequence-function'
 include 'aula28-weather-async'
 include 'aula30-weather-reactive'
 include 'aula33-weather-reactive-web'
+include 'aula36-java-flow'
 
 rootProject.name = 'isel-mpd-aulas-2020'

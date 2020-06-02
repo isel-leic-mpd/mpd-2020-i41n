@@ -39,6 +39,7 @@ public class TemperaturesSubscription implements Flow.Subscription {
     @Override
     public void cancel() {
         exec.shutdown();
+        subscriber.onComplete();
     }
 }
 

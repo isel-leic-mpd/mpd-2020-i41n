@@ -1,6 +1,7 @@
 package pt.isel.mpd.sub;
 
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import org.reactivestreams.FlowAdapters;
 import pt.isel.mpd.pub.TemperaturesPublisher;
 
@@ -19,9 +20,9 @@ public class App {
         Observable
             .fromPublisher(FlowAdapters.toPublisher(newYork))
             .doOnNext(item -> System.out.println(item))
+            .doOnComplete(() -> System.out.println("FINISH"))
             .take(3)
             .blockingSubscribe();
-
     }
 
     static class PrinterSubscriber<T> implements Flow.Subscriber<T> {

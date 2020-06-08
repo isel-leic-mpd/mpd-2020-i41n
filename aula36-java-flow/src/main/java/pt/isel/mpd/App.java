@@ -1,4 +1,4 @@
-package pt.isel.mpd.sub;
+package pt.isel.mpd;
 
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
